@@ -1,16 +1,14 @@
 package io.learning.api
 
-import com.zaxxer.hikari.HikariDataSource
+import com.google.inject.Guice
 import io.learning.api.controllers.UserController
 import io.learning.api.db.UserDao
+import io.learning.api.di.DatabaseModule
 import io.learning.api.services.UserService
 import io.vertx.core.Vertx
 import io.vertx.ext.web.Router
 import org.flywaydb.core.Flyway
 import org.jdbi.v3.core.Jdbi
-import org.jdbi.v3.core.kotlin.KotlinPlugin
-import org.jdbi.v3.sqlobject.SqlObjectPlugin
-import org.jdbi.v3.sqlobject.kotlin.KotlinSqlObjectPlugin
 import javax.sql.DataSource
 
 fun main(args: Array<String>) {
@@ -19,10 +17,13 @@ fun main(args: Array<String>) {
     val vertx = Vertx.vertx()
     val server = vertx.createHttpServer()
 
+    val injector = Guice.createInjector(DatabaseModule())
+
     val router = Router.router(vertx)
 
-    val dataSource = getDataSource()
-    val dbi = getDbi(dataSource)
+    val dataSource = injector.getInstance(DataSource::class.java)
+
+    val dbi = injector.getInstance(Jdbi::class.java)
     migrate(dataSource, clean = true)
 
     val userDao = dbi.onDemand(UserDao::class.java)
@@ -40,28 +41,6 @@ fun main(args: Array<String>) {
     }
 }
 
-fun getDataSource(): DataSource {
-    val host = "127.0.0.1"
-    val port = "3306"
-    val dbName = "learning"
-    val requireSSL = false
-    val user = "root"
-    val password = ""
-    val connectionPoolSize = 4
-
-    val jdbcUrl = "jdbc:mysql://$host:$port/$dbName?verifyServerCertificate=$requireSSL&useSSL=$requireSSL&serverTimezone=UTC"
-    val dataSource = HikariDataSource()
-    dataSource.jdbcUrl = jdbcUrl
-    dataSource.username = user
-    dataSource.password = password
-    dataSource.maximumPoolSize = connectionPoolSize
-    dataSource.addDataSourceProperty("cachePrepStmts", true)
-    dataSource.addDataSourceProperty("prepStmtCacheSize", 250)
-    dataSource.addDataSourceProperty("prepStmtCacheSqlLimit", 2048)
-
-    return dataSource
-}
-
 fun migrate(dataSource: DataSource, baseline: Boolean = true, clean: Boolean = false) {
     val flyway = Flyway()
     flyway.dataSource = dataSource
@@ -70,12 +49,4 @@ fun migrate(dataSource: DataSource, baseline: Boolean = true, clean: Boolean = f
         flyway.clean()
     }
     flyway.migrate()
-}
-
-fun getDbi(dataSource: DataSource): Jdbi {
-    val jdbi = Jdbi.create(dataSource)
-    jdbi.installPlugin(SqlObjectPlugin())
-    jdbi.installPlugin(KotlinPlugin())
-    jdbi.installPlugin(KotlinSqlObjectPlugin())
-    return jdbi
 }
