@@ -1,16 +1,11 @@
 package io.learning.api.services
 
-import io.learning.api.db.UserDao
 import io.learning.api.entities.User
 
-class UserService(private val userDao: UserDao) {
+interface UserService {
 
-    fun findAll(): Set<User> {
-        return userDao.selectAll()
-    }
+    fun findAll(): Set<User>
 
-    fun findById(id: Int): User {
-        return userDao.selectById(id)
-    }
+    fun findById(id: Int): User
 
 }

@@ -2,13 +2,12 @@ package io.learning.api
 
 import com.google.inject.Guice
 import io.learning.api.controllers.UserController
-import io.learning.api.db.UserDao
 import io.learning.api.di.DatabaseModule
-import io.learning.api.services.UserService
+import io.learning.api.di.PropertiesModule
+import io.learning.api.di.UserModule
 import io.vertx.core.Vertx
 import io.vertx.ext.web.Router
 import org.flywaydb.core.Flyway
-import org.jdbi.v3.core.Jdbi
 import javax.sql.DataSource
 
 fun main(args: Array<String>) {
@@ -17,18 +16,15 @@ fun main(args: Array<String>) {
     val vertx = Vertx.vertx()
     val server = vertx.createHttpServer()
 
-    val injector = Guice.createInjector(DatabaseModule())
-
     val router = Router.router(vertx)
+
+    val injector = Guice.createInjector(DatabaseModule(), UserModule(), PropertiesModule())
 
     val dataSource = injector.getInstance(DataSource::class.java)
 
-    val dbi = injector.getInstance(Jdbi::class.java)
     migrate(dataSource, clean = true)
 
-    val userDao = dbi.onDemand(UserDao::class.java)
-    val userService = UserService(userDao)
-    val userCtrl = UserController(userService)
+    val userCtrl = injector.getInstance(UserController::class.java)
 
     router.get("/users").blockingHandler(userCtrl::findAll)
 
