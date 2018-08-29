@@ -17,9 +17,13 @@ class UserModule: AbstractModule() {
     }
 
     @Provides
-    @Named("userRouter")
-    fun getUserRouter(userController: UserController, userRouter: Router): Router {
-        userRouter.get("/").blockingHandler(userController::findAll)
-        return userRouter
+    @Named("usersRouter")
+    fun getUsersRouter(userController: UserController, usersRouter: Router): Router {
+        usersRouter.get("/").blockingHandler(userController::findAll)
+        usersRouter.get("/:id").blockingHandler(userController::findById)
+        usersRouter.post("/").blockingHandler(userController::insertUser)
+        usersRouter.put("/:id").blockingHandler(userController::updateUser)
+        usersRouter.delete("/:id").blockingHandler(userController::deleteUser)
+        return usersRouter
     }
 }
