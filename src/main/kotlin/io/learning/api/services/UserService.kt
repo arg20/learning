@@ -16,4 +16,19 @@ class UserService @Inject constructor (private val userDao: UserDao) {
         return userDao.selectById(id)
     }
 
+    fun insertUser(user: User): User {
+        var id = userDao.insertUser(user)
+        return user.copy(id=id)
+    }
+
+    fun updateUser(user: User) {
+        userDao.updateUser(user)
+    }
+
+    fun deleteUser(id: Int) {
+        userDao.deleteUser(id)
+    }
+
+    //TODO partial updates
+
 }

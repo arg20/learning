@@ -6,7 +6,6 @@ import io.learning.api.di.PropertiesModule
 import io.learning.api.di.AppConfigModule
 import io.learning.api.di.UserModule
 import io.learning.api.utils.AppConfig
-import io.vertx.core.Vertx
 import org.flywaydb.core.Flyway
 import javax.sql.DataSource
 

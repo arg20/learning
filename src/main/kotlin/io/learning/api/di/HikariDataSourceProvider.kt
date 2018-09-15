@@ -11,12 +11,14 @@ class HikariDataSourceProvider @Inject constructor(
         @Named("db.learning.port") private val port: Int,
         @Named("db.learning.dbName") private val dbName: String,
         @Named("db.learning.requireSSL") private val requireSSL: Boolean,
+        @Named("db.learning.serverTimezone") private val serverTimezone: String,
+        @Named("db.learning.allowPublicKeyRetrieval") private val allowPublicKeyRetrieval: Boolean,
         @Named("db.learning.user") private val user:String,
         @Named("db.learning.password") private val password: String,
         @Named("db.learning.connectionPoolSize") private val connectionPoolSize: Int): Provider<DataSource> {
 
     override fun get(): DataSource {
-        val jdbcUrl = "jdbc:mysql://$host:$port/$dbName?verifyServerCertificate=$requireSSL&useSSL=$requireSSL&serverTimezone=UTC"
+        val jdbcUrl = "jdbc:mysql://$host:$port/$dbName?verifyServerCertificate=$requireSSL&useSSL=$requireSSL&serverTimezone=$serverTimezone&allowPublicKeyRetrieval=$allowPublicKeyRetrieval"
         val dataSource = HikariDataSource()
         dataSource.jdbcUrl = jdbcUrl
         dataSource.username = user
