@@ -18,7 +18,6 @@ class AppConfigModule: AbstractModule() {
     @Provides
     @Singleton
     fun getVertx(): Vertx {
-        System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.Log4j2LogDelegateFactory")
         return Vertx.vertx()
     }
 
