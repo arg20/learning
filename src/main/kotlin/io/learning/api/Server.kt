@@ -17,6 +17,8 @@ fun main(args: Array<String>) {
             PropertiesModule(),
             AppConfigModule())
 
+    System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.Log4j2LogDelegateFactory")
+
     val appConfig = injector.getInstance(AppConfig::class.java)
 
     val server = appConfig.vertx.createHttpServer()

@@ -7,6 +7,8 @@ import io.vertx.core.Vertx
 import io.vertx.core.json.Json
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.BodyHandler
+import io.vertx.ext.web.handler.LoggerFormat
+import io.vertx.ext.web.handler.LoggerHandler
 
 class AppConfig @Inject constructor (
         val vertx: Vertx,
@@ -18,6 +20,7 @@ class AppConfig @Inject constructor (
     init {
         Json.mapper.registerModule(KotlinModule())
         mainRouter.route().handler(BodyHandler.create())
+        mainRouter.route().handler(LoggerHandler.create(LoggerFormat.TINY))
         mainRouter.mountSubRouter(usersPath, usersRouter)
     }
 
